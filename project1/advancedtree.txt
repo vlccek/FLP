@@ -1,0 +1,27 @@
+Node: 0, 690.585
+  Node: 2, 645.255
+    Node: 3, 359.705
+      Leaf: Class4
+      Leaf: Class1
+    Node: 5, 548.355
+      Leaf: Class6
+      Node: 0, 387.415
+        Leaf: Class7
+        Node: 0, 452.235
+          Leaf: Class3
+          Leaf: Class5
+  Leaf: Class10
+
+
+Nd (0.0,690.585)
+    (Nd (2.0,645.255)
+        (Nd (3.0,359.705)
+            (Lf "Class4")
+            (Lf "Class1")
+        )
+        (Nd (5.0,548.355)
+            (Lf "Class6")
+            (Nd (0.0,387.415)
+            (Lf "Class7") (Nd (0.0,452.235) (Lf "Class3") (Lf "Class5")))))
+    (Lf "Class10")
+
