@@ -4,9 +4,10 @@
 -- Description:
 
 import Data.Char (isAlpha, isDigit, isSpace, ord)
-import Data.List (dropWhileEnd, find, isPrefixOf)
+import Data.List (dropWhileEnd, find, isPrefixOf, nub, partition,minimumBy)
 import Data.List.Split (splitOn)
 import System.Environment (getArgs)
+import Data.Ord (comparing)
 
 
 -- Simple tree definition
@@ -119,7 +120,7 @@ traindataline = "2.4,1.3,TridaA"
 
 classstr = ["2.4,1.3", "6.1,0.3", "6.3,4.4"]
 
-traintest = [([2.4,1.3],"TridaA"),([2.4,1.3],"TridaB"), ([2.4,1.3],"TridaC"), ([2.4,1.3],"TridaA")]
+traintest = [([2.4,1.3],"TridaA"),([6.1,0.3],"TridaB"), ([6.678,0.6],"TridaC"), ([2.4,10],"TridaA")]
 
 
 -- parsing file with values and classfication of values :)
@@ -159,13 +160,45 @@ loadTrainFile x = ( map (\y -> read y :: Float)  ( reverse (drop 1 (reverse (spl
 trainedClass [] v = v
 trainedClass ((_, xb):xs) v = if xb `elem` v then  trainedClass xs v else trainedClass xs (xb:v)  
 
--- Takes the list of sambles in format [([Float],String) ] and return how manytime is the class used.
+-- Takes the list of sambles in format [([Float],String) ] and return how manytime is in the class used.
 countClassN l className = foldl (\x y -> if (snd y) == className then (1+x) else x ) 0 l
 
 
 
 -- gimi (trainedClass traintest []) traintest 
-gimi classSet samples = 1- sum (map (\x -> (fromIntegral (countClassN samples x) / fromIntegral (length samples))^2) classSet)
+gimi samples = 1- sum (map (\x -> (fromIntegral (countClassN samples x) / fromIntegral (length samples))^2) (trainedClass samples []))
+
+gimiWeight samples = (gimi samples)* fromIntegral (length samples)
+
+
+getListOfBorders samples x_num = map (\x -> x !! x_num)$ map (\x -> fst x ) samples
+
+splitDataByBorder x_samples y_Borderd z_index = partition (\x -> ((fst x) !! z_index) < y_Borderd) x_samples
+
+gimiOfSplit (x,y) = [gimiWeight x, gimiWeight y ]
 
 
 
+-- tuple (param index, GIMI, split border)
+getSplit samples a = map (\x -> (a, (sum $ gimiOfSplit $  splitDataByBorder samples x a ) / fromIntegral (length samples), x) ) $ getListOfBorders samples a
+
+getAllSplits samples x = if x > 0 then (getSplit samples x) ++ (getAllSplits samples (x-1)) else []
+countNumberOfParams samples = length $ fst (samples !! 0) 
+
+
+-- Returns minimal split value and param number based on minimal gimi index, (paramid, gimi, split value )
+getMinimalSplit samples = minimumBy (comparing (\(_, c,_) -> c)) $ foldl (\x y -> x ++ (getAllSplits samples y)  ) [] [0.. (countNumberOfParams samples) - 1]
+
+
+shouldStop samples = if ((length $ trainedClass samples []) < 2) then True else False
+
+
+getLabel samples = let x = trainedClass samples []
+                    in x
+
+buildTree samples
+  | shouldStop samples = Lf (getLabel samples)
+  | otherwise =
+      let (paramId, _ , splitValue) = getMinimalSplit samples
+          (leftSamples, rightSamples) = splitDataByBorder samples splitValue paramId
+      in Nd (paramId, splitValue) (buildTree leftSamples) (buildTree rightSamples)
