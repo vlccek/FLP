@@ -21,14 +21,15 @@ main = do
     ("-1" : treeFile : dataFile : []) -> do
       -- putStrLn $ "Režim -1: načítám strom ze souboru " ++ treeFile ++ " a data ze souboru " ++ dataFile
       treeString <- readFile treeFile
-      dataFile <- readFile dataFile
+      dataFileStr <- readFile dataFile
       --             STRINGING FROM ARRAY                                                TREEE                                    CLASES VALUES
       --        ________________________________                   ______________________________________________________     _________________________
-      putStrLn (foldl (\x y -> x++(y)++"\n" ) ""  (map (findClass (parseTreeLines (map countIndent (lines treeString)) 0) ) (parseClassString classstr)))
+      putStrLn (foldl (\x y -> x++(y)++"\n" ) ""  (map (findClass (parseTreeLines (map countIndent (lines treeString)) 0) ) (parseClassString $ lines dataFileStr)))
     ("-2" : trainFile : []) -> do
-      dataFile <- readFile trainFile
+      trainFileStr <- readFile trainFile
+      printTree $ buildTree $ (map (\x -> loadTrainFile x ) (lines trainFileStr))
       -- putStrLn (show )
-      putStrLn $ "Režim -2: načítám trénovací data ze souboru " ++ trainFile
+      -- putStrLn $ "Režim -2: načítám trénovací data ze souboru " ++ trainFile
     ("-3" : treeFile : []) -> do
       treeString <- readFile treeFile
       putStrLn (show (parseTreeLines (map countIndent (lines treeString)) 0))
@@ -193,7 +194,7 @@ getMinimalSplit samples = minimumBy (comparing (\(_, c,_) -> c)) $ foldl (\x y -
 shouldStop samples = if ((length $ trainedClass samples []) < 2) then True else False
 
 
-getLabel samples = let x = trainedClass samples []
+getLabel samples = let [x] = trainedClass samples []
                     in x
 
 buildTree samples
@@ -202,3 +203,16 @@ buildTree samples
       let (paramId, _ , splitValue) = getMinimalSplit samples
           (leftSamples, rightSamples) = splitDataByBorder samples splitValue paramId
       in Nd (paramId, splitValue) (buildTree leftSamples) (buildTree rightSamples)
+
+
+
+printTree :: (Show a, Show b) => Tree a b -> IO ()
+printTree tree = printTreeHelper tree 0
+
+printTreeHelper :: (Show a, Show b) => Tree a b -> Int -> IO ()
+printTreeHelper (Lf b) indent = 
+  putStrLn $ replicate indent ' ' ++ "Leaf: " ++ show b
+printTreeHelper (Nd a left right) indent = do
+  putStrLn $ replicate indent ' ' ++ "Node: " ++ show a
+  printTreeHelper left (indent + 2)
+  printTreeHelper right (indent + 2)

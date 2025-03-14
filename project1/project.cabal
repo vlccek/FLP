@@ -22,7 +22,7 @@ maintainer:         43584052+vlccek@users.noreply.github.com
 extra-source-files: CHANGELOG.md
 
 executable project1
-    main-is:          parser.hs
+    main-is:          flp-fun.hs
 
     -- Modules included in this executable, other than Main.
     -- other-modules:
