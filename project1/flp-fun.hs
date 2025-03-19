@@ -105,54 +105,29 @@ parseNodeLine x = (\[a, b] -> (read a :: Int, read b :: Float)) (splitOn "," (dr
 parseNodeLf :: String -> String
 parseNodeLf x = (\[a, b] -> b) (splitOn " " x)
 
---- tady je postup je probíhal:
---- TODO REMOVE DEBILE
-
-step1 = [(1, "Leaf: TridaA"), (1, "Node: 1, 3.0"), (2, "Leaf: TridaB"), (2, "Leaf: TridaC")]
-
-parserdData = ["Node: 0, 5.5", "  Leaf: TridaA", "  Node: 1, 3.0", "    Leaf: TridaB", "    Leaf: TridaC"]
-
-parsedWithLines = [(0, "Node: 0, 5.5"), (1, "Leaf: TridaA"), (1, "Node: 1, 3.0"), (2, "Leaf: TridaB"), (2, "Leaf: TridaC")]
-
-parsedWithLinesAd = [(0, "Node: 0, 690.585"), (1, "Node: 2, 645.255"), (2, "Node: 3, 359.705"), (3, "Leaf: Class4"), (3, "Leaf: Class1"), (2, "Node: 5, 548.355"), (3, "Leaf: Class6"), (3, "Node: 0, 387.415"), (4, "Leaf: Class7"), (4, "Node: 0, 452.235"), (5, "Leaf: Class3"), (5, "Leaf: Class5"), (1, "Leaf: Class10")]
-
-
-traindataline = "2.4,1.3,TridaA"
-
-classstr = ["2.4,1.3", "6.1,0.3", "6.3,4.4"]
-
-traintest = [([2.4,1.3],"TridaA"),([6.1,0.3],"TridaB"), ([6.678,0.6],"TridaC"), ([2.4,10],"TridaA")]
-
-
--- parsing file with values and classfication of values :)
+------------------------------ parsing file with values and classfication of values :)------------------------------
 
 
 
-
+-- parse the string of class (leaf node)
 parseClassString :: [String] -> [[Float]]
 parseClassString x = map (\y -> map (read) (splitOn "," y)) x
 
 
-
+ -- base on input and tree returns input :(
 findClass :: Ord a => Tree (Int, a) b -> [a] -> b
 findClass t val = case t of
   Lf x      -> x
   Nd (a,b) l r  -> if (val !! a) < b then findClass l val else findClass r val
 
 
--- cart algorithm
+------------------------------------------------------ cart algorithm impl ------------------------------------------------------------------
 
 
 --- parse cartfile
 
 loadTrainFile :: String -> ([Float],String)
 loadTrainFile x = ( map (\y -> read y :: Float)  ( reverse (drop 1 (reverse (splitOn "," x)))) , last (splitOn "," x))
-
-
-
--- numberOFclass :: [([Float],String)] -> Integer
-
---trainedClass :: [([Float],String)] -> [String] -> [String]
 
 
 -- Takes the list of sambles in format [([Float],String) ] and creates the list of strings that contains all of the mentioned class once.
@@ -165,17 +140,22 @@ trainedClass ((_, xb):xs) v = if xb `elem` v then  trainedClass xs v else traine
 countClassN l className = foldl (\x y -> if (snd y) == className then (1+x) else x ) 0 l
 
 
-
 -- gimi (trainedClass traintest []) traintest 
 gimi samples = 1- sum (map (\x -> (fromIntegral (countClassN samples x) / fromIntegral (length samples))^2) (trainedClass samples []))
 
+
+-- helper for computing weight gimi index
 gimiWeight samples = (gimi samples)* fromIntegral (length samples)
 
 
+-- takes the samples and creates the list of possible spliting options
 getListOfBorders samples x_num = map (\x -> x !! x_num)$ map (\x -> fst x ) samples
 
+
+-- split samples to 2 groups base on feature index and Border value
 splitDataByBorder x_samples y_Borderd z_index = partition (\x -> ((fst x) !! z_index) < y_Borderd) x_samples
 
+-- Gimi of splited 
 gimiOfSplit (x,y) = [gimiWeight x, gimiWeight y ]
 
 
@@ -183,6 +163,8 @@ gimiOfSplit (x,y) = [gimiWeight x, gimiWeight y ]
 -- tuple (param index, GIMI, split border)
 getSplit samples a = map (\x -> (a, (sum $ gimiOfSplit $  splitDataByBorder samples x a ) / fromIntegral (length samples), x) ) $ getListOfBorders samples a
 
+-- splits the samples by each feature and every option
+-- out: [(param index, GIMI, split border)]
 getAllSplits samples x = if x > 0 then (getSplit samples x) ++ (getAllSplits samples (x-1)) else []
 countNumberOfParams samples = length $ fst (samples !! 0) 
 
@@ -190,13 +172,15 @@ countNumberOfParams samples = length $ fst (samples !! 0)
 -- Returns minimal split value and param number based on minimal gimi index, (paramid, gimi, split value )
 getMinimalSplit samples = minimumBy (comparing (\(_, c,_) -> c)) $ foldl (\x y -> x ++ (getAllSplits samples y)  ) [] [0.. (countNumberOfParams samples) - 1]
 
-
+-- Test if there is only one class 
 shouldStop samples = if ((length $ trainedClass samples []) < 2) then True else False
 
-
+-- Create the representation of the Leaf node
 getLabel samples = let [x] = trainedClass samples []
                     in x
 
+
+-- Create the tree from samples
 buildTree samples
   | shouldStop samples = Lf (getLabel samples)
   | otherwise =
@@ -205,7 +189,7 @@ buildTree samples
       in Nd (paramId, splitValue) (buildTree leftSamples) (buildTree rightSamples)
 
 
-
+-- wrapper for PrintTreeHelper Function, Print the treen in expected format
 printTree :: (Show a, Show b) => Tree a b -> IO ()
 printTree tree = printTreeHelper tree 0
 
