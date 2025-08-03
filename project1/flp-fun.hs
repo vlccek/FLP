@@ -3,11 +3,20 @@
 --
 -- Description:
 
-import Data.Char (isAlpha, isDigit, isSpace, ord)
+import Data.Char (isAlpha, isDigit, isSpace)
 import Data.List (dropWhileEnd, find, isPrefixOf, nub, partition,minimumBy)
-import Data.List.Split (splitOn)
+-- import Data.List.Split (splitOn)
 import System.Environment (getArgs)
 import Data.Ord (comparing)
+
+
+splitOn :: Eq a => a -> [a] -> [[a]]
+splitOn _ [] = []
+splitOn delim l =
+  let prefix = takeWhile (/= delim) l
+      rest   = drop 1 (dropWhile (/= delim) l)
+  in prefix : splitOn delim rest
+
 
 
 -- Simple tree definition
@@ -99,11 +108,11 @@ parseTreeLines ((y, x) : xz) l
 
 -- takes string as an argument an extract the index of feature and edge value
 parseNodeLine :: String -> (Int, Float)
-parseNodeLine x = (\[a, b] -> (read a :: Int, read b :: Float)) (splitOn "," (dropWhile (not . isDigit) x))
+parseNodeLine x = (\[a, b] -> (read a :: Int, read b :: Float)) (splitOn ',' (dropWhile (not . isDigit) x))
 
 -- From line contains the Leaf extracet just the name of the class
 parseNodeLf :: String -> String
-parseNodeLf x = (\[a, b] -> b) (splitOn " " x)
+parseNodeLf x = (\[a, b] -> b) (splitOn ' ' x)
 
 ------------------------------ parsing file with values and classfication of values :)------------------------------
 
@@ -111,7 +120,7 @@ parseNodeLf x = (\[a, b] -> b) (splitOn " " x)
 
 -- parse the string of class (leaf node)
 parseClassString :: [String] -> [[Float]]
-parseClassString x = map (\y -> map (read) (splitOn "," y)) x
+parseClassString x = map (\y -> map (read) (splitOn ',' y)) x
 
 
  -- base on input and tree returns input :(
@@ -127,7 +136,7 @@ findClass t val = case t of
 --- parse cartfile
 
 loadTrainFile :: String -> ([Float],String)
-loadTrainFile x = ( map (\y -> read y :: Float)  ( reverse (drop 1 (reverse (splitOn "," x)))) , last (splitOn "," x))
+loadTrainFile x = ( map (\y -> read y :: Float)  ( reverse (drop 1 (reverse (splitOn ',' x)))) , last (splitOn ',' x))
 
 
 -- Takes the list of sambles in format [([Float],String) ] and creates the list of strings that contains all of the mentioned class once.
@@ -165,12 +174,19 @@ getSplit samples a = map (\x -> (a, (sum $ gimiOfSplit $  splitDataByBorder samp
 
 -- splits the samples by each feature and every option
 -- out: [(param index, GIMI, split border)]
-getAllSplits samples x = if x > 0 then (getSplit samples x) ++ (getAllSplits samples (x-1)) else []
+
+getAllSplits samples x
+  | x < 0     = []
+  | otherwise = getSplit samples x ++ getAllSplits samples (x - 1)
+
+
 countNumberOfParams samples = length $ fst (samples !! 0) 
 
 
 -- Returns minimal split value and param number based on minimal gimi index, (paramid, gimi, split value )
-getMinimalSplit samples = minimumBy (comparing (\(_, c,_) -> c)) $ foldl (\x y -> x ++ (getAllSplits samples y)  ) [] [0.. (countNumberOfParams samples) - 1]
+getMinimalSplit samples =
+    minimumBy (comparing (\(_, c, _) -> c)) $
+      concatMap (getSplit samples) [0..countNumberOfParams samples - 1]
 
 -- Test if there is only one class 
 shouldStop samples = if ((length $ trainedClass samples []) < 2) then True else False
@@ -190,13 +206,15 @@ buildTree samples
 
 
 -- wrapper for PrintTreeHelper Function, Print the treen in expected format
-printTree :: (Show a, Show b) => Tree a b -> IO ()
+printTree :: (Show x, Show y, Show b) => Tree (x, y) b -> IO ()
 printTree tree = printTreeHelper tree 0
 
-printTreeHelper :: (Show a, Show b) => Tree a b -> Int -> IO ()
-printTreeHelper (Lf b) indent = 
+printTreeHelper
+  :: (Show x, Show y, Show b) => Tree (x, y) b -> Int -> IO ()
+printTreeHelper (Lf b) indent =
   putStrLn $ replicate indent ' ' ++ "Leaf: " ++ show b
-printTreeHelper (Nd a left right) indent = do
-  putStrLn $ replicate indent ' ' ++ "Node: " ++ show a
-  printTreeHelper left (indent + 2)
+
+printTreeHelper (Nd (x, y) left right) indent = do
+  putStrLn $ replicate indent ' ' ++ "Node: " ++ show x ++ ", " ++ show y
+  printTreeHelper left  (indent + 2)
   printTreeHelper right (indent + 2)

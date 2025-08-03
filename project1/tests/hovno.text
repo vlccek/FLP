@@ -1,0 +1,133 @@
+Node: 2, 207.0
+  Node: 2, 193.0
+    Node: 3, 3725.0
+      Node: 2, 187.0
+        Node: 3, 3700.0
+          Node: 2, 182.0
+            Node: 1, 18.3
+              Node: 1, 17.3
+                Leaf: "Adelie"
+                Node: 3, 3625.0
+                  Leaf: "Chinstrap"
+                  Leaf: "Adelie"
+              Leaf: "Adelie"
+            Leaf: "Adelie"
+          Node: 1, 17.8
+            Leaf: "Chinstrap"
+            Node: 2, 185.0
+              Leaf: "Chinstrap"
+              Leaf: "Adelie"
+        Node: 1, 16.8
+          Node: 1, 16.5
+            Leaf: "Adelie"
+            Node: 2, 190.0
+              Leaf: "Chinstrap"
+              Node: 2, 191.0
+                Leaf: "Adelie"
+                Leaf: "Chinstrap"
+          Node: 3, 3350.0
+            Node: 1, 18.7
+              Leaf: "Adelie"
+              Leaf: "Chinstrap"
+            Node: 3, 3600.0
+              Node: 3, 3525.0
+                Node: 1, 17.3
+                  Leaf: "Adelie"
+                  Node: 1, 17.6
+                    Leaf: "Chinstrap"
+                    Node: 2, 192.0
+                      Node: 1, 17.9
+                        Leaf: "Adelie"
+                        Node: 3, 3450.0
+                          Leaf: "Chinstrap"
+                          Node: 1, 18.6
+                            Leaf: "Adelie"
+                            Node: 2, 190.0
+                              Leaf: "Adelie"
+                              Leaf: "Chinstrap"
+                      Leaf: "Chinstrap"
+                Leaf: "Chinstrap"
+              Node: 1, 18.6
+                Node: 1, 17.5
+                  Leaf: "Adelie"
+                  Node: 1, 17.8
+                    Node: 2, 190.0
+                      Leaf: "Chinstrap"
+                      Leaf: "Adelie"
+                    Leaf: "Chinstrap"
+                Leaf: "Adelie"
+      Leaf: "Adelie"
+    Node: 3, 4200.0
+      Node: 3, 3600.0
+        Node: 2, 196.0
+          Node: 1, 19.4
+            Node: 3, 3325.0
+              Node: 3, 3300.0
+                Leaf: "Adelie"
+                Leaf: "Chinstrap"
+              Leaf: "Adelie"
+            Node: 1, 20.3
+              Leaf: "Chinstrap"
+              Leaf: "Adelie"
+          Node: 3, 3500.0
+            Leaf: "Chinstrap"
+            Node: 2, 197.0
+              Node: 1, 17.2
+                Leaf: "Chinstrap"
+                Node: 1, 19.1
+                  Leaf: "Adelie"
+                  Leaf: "Chinstrap"
+              Leaf: "Adelie"
+        Node: 3, 3750.0
+          Leaf: "Chinstrap"
+          Node: 2, 203.0
+            Node: 3, 3975.0
+              Node: 3, 3775.0
+                Node: 1, 18.2
+                  Leaf: "Adelie"
+                  Node: 1, 19.1
+                    Leaf: "Chinstrap"
+                    Leaf: "Adelie"
+                Node: 1, 20.5
+                  Node: 1, 16.8
+                    Leaf: "Adelie"
+                    Node: 1, 18.4
+                      Leaf: "Chinstrap"
+                      Node: 1, 18.7
+                        Leaf: "Adelie"
+                        Node: 2, 194.0
+                          Node: 1, 19.4
+                            Leaf: "Adelie"
+                            Leaf: "Chinstrap"
+                          Leaf: "Chinstrap"
+                  Leaf: "Adelie"
+              Node: 3, 4050.0
+                Leaf: "Adelie"
+                Node: 2, 201.0
+                  Node: 2, 196.0
+                    Leaf: "Chinstrap"
+                    Node: 1, 19.5
+                      Node: 1, 19.0
+                        Leaf: "Adelie"
+                        Leaf: "Chinstrap"
+                      Leaf: "Adelie"
+                  Leaf: "Chinstrap"
+            Leaf: "Chinstrap"
+      Node: 2, 201.0
+        Node: 1, 18.3
+          Node: 1, 18.2
+            Leaf: "Adelie"
+            Leaf: "Chinstrap"
+          Leaf: "Adelie"
+        Node: 1, 18.5
+          Node: 1, 18.1
+            Leaf: "Gentoo"
+            Leaf: "Adelie"
+          Node: 3, 4725.0
+            Leaf: "Chinstrap"
+            Leaf: "Adelie"
+  Node: 1, 18.0
+    Leaf: "Gentoo"
+    Node: 1, 19.0
+      Leaf: "Adelie"
+      Leaf: "Chinstrap"
